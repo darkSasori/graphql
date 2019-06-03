@@ -5,8 +5,8 @@ type User struct {
 	Username, Displayname string
 }
 
-func NewUser(username, displayname string) User {
-	return User{
+func NewUser(username, displayname string) *User {
+	return &User{
 		Username:    username,
 		Displayname: displayname,
 	}
