@@ -3,5 +3,8 @@ dev:
 	go build -tags dev -o bin/dev cmd/test.go
 	./bin/dev
 
-test:
-	go test -v --tags test_unit ./...
+test-unit:
+	go test -v --tags test_unit -race ./...
+
+lint:
+	golint -set_exit_status ./...

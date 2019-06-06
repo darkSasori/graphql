@@ -16,7 +16,6 @@ func NewUser(repository UserRepository) *User {
 	return &User{repository}
 }
 
-// Save a user
 func (u *User) Save(ctx context.Context, user *model.User) error {
 	if user.ID == nil {
 		if err := u.userRepository.Insert(ctx, user); err != nil {
