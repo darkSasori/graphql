@@ -9,10 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// User repository
 type User struct {
 	coll *mongo.Collection
 }
 
+// NewUser return a pointer to user
 func NewUser(client *mongo.Database) *User {
 	return &User{client.Collection("user")}
 }
@@ -21,6 +23,7 @@ func (u *User) getFilterOne(user *model.User) bson.M {
 	return bson.M{"_id": user.ID}
 }
 
+// Insert a new user in db
 func (u *User) Insert(ctx context.Context, user *model.User) error {
 	result, err := u.coll.InsertOne(ctx, user)
 	if err != nil {
@@ -30,10 +33,12 @@ func (u *User) Insert(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+// FindAll return all user
 func (u *User) FindAll(ctx context.Context) (service.Cursor, error) {
 	return u.coll.Find(ctx, bson.D{{}})
 }
 
+// FindOne return a user or error if not found
 func (u *User) FindOne(ctx context.Context, id interface{}) (*model.User, error) {
 	var result model.User
 	filter := bson.D{{"_id", id}}
@@ -43,6 +48,7 @@ func (u *User) FindOne(ctx context.Context, id interface{}) (*model.User, error)
 	return &result, nil
 }
 
+// Delete user
 func (u *User) Delete(ctx context.Context, user *model.User) error {
 	_, err := u.coll.DeleteOne(ctx, u.getFilterOne(user))
 	if err != nil {
@@ -51,6 +57,7 @@ func (u *User) Delete(ctx context.Context, user *model.User) error {
 	return nil
 }
 
+// Update user
 func (u *User) Update(ctx context.Context, user *model.User) error {
 	update := bson.D{
 		{"$set", bson.D{
@@ -62,5 +69,6 @@ func (u *User) Update(ctx context.Context, user *model.User) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

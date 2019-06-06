@@ -20,6 +20,7 @@ func init() {
 	mongoClient = client
 }
 
+// Connect to db
 func Connect(ctx context.Context) (*mongo.Client, error) {
 	err := mongoClient.Connect(ctx)
 	if err != nil {
