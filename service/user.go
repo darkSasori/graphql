@@ -8,7 +8,7 @@ import (
 
 // User Service
 type User struct {
-	userRepository UserRepository
+	Repository UserRepository
 }
 
 // NewUser return a pointer to User
@@ -16,19 +16,20 @@ func NewUser(repository UserRepository) *User {
 	return &User{repository}
 }
 
+// Save the user
 func (u *User) Save(ctx context.Context, user *model.User) error {
 	if user.ID == nil {
-		if err := u.userRepository.Insert(ctx, user); err != nil {
+		if err := u.Repository.Insert(ctx, user); err != nil {
 			return err
 		}
 		return nil
 	}
 
-	if _, err := u.userRepository.FindOne(ctx, user.ID); err != nil {
+	if _, err := u.Repository.FindOne(ctx, user.ID); err != nil {
 		return err
 	}
 
-	if err := u.userRepository.Update(ctx, user); err != nil {
+	if err := u.Repository.Update(ctx, user); err != nil {
 		panic(err)
 	}
 	return nil
@@ -36,5 +37,5 @@ func (u *User) Save(ctx context.Context, user *model.User) error {
 
 // Remove user
 func (u *User) Remove(ctx context.Context, user *model.User) error {
-	return u.userRepository.Delete(ctx, user)
+	return u.Repository.Delete(ctx, user)
 }
