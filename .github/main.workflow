@@ -1,6 +1,6 @@
 workflow "CI" {
   on = "push"
-  resolves = ["test-unit", "lint"]
+  resolves = ["test-unit"]
 }
 
 action "test-unit" {
@@ -9,9 +9,4 @@ action "test-unit" {
   env = {
     GO111MODULE = "on"
   }
-}
-
-action "lint" {
-  uses = "./.github/action-lint"
-  args = "run"
 }

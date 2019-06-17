@@ -3,8 +3,8 @@ package schema
 import (
 	"context"
 
-	"github.com/darksasori/graphql/model"
-	"github.com/darksasori/graphql/service"
+	"github.com/darksasori/graphql/pkg/model"
+	"github.com/darksasori/graphql/pkg/service"
 	graphql "github.com/graph-gophers/graphql-go"
 )
 

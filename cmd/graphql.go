@@ -5,10 +5,11 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/darksasori/graphql/db"
-	"github.com/darksasori/graphql/repository"
-	"github.com/darksasori/graphql/schema"
-	"github.com/darksasori/graphql/service"
+	"github.com/darksasori/graphql/pkg/db"
+	"github.com/darksasori/graphql/pkg/repository"
+	"github.com/darksasori/graphql/pkg/schema"
+	"github.com/darksasori/graphql/pkg/service"
+	"github.com/darksasori/graphql/pkg/utils"
 	"github.com/graph-gophers/graphql-go/relay"
 
 	"log"
@@ -26,7 +27,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	connDB := conn.Database("test")
+	connDB := conn.Database(utils.GetEnvDefault("MONGODB_NAME", "blog"))
 
 	user := service.NewUser(repository.NewUser(connDB))
 	s := schema.New(user)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/darksasori/graphql/config"
+	"github.com/darksasori/graphql/pkg/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -12,7 +12,8 @@ import (
 var mongoClient *mongo.Client
 
 func init() {
-	client, err := mongo.NewClient(options.Client().ApplyURI(config.MONGODB_URI))
+	uri := utils.GetEnvDefault("MONGODB_URI", "mongodb://localhost:27017")
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}

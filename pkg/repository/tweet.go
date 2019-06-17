@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/darksasori/graphql/model"
-	"github.com/darksasori/graphql/service"
+	"github.com/darksasori/graphql/pkg/model"
+	"github.com/darksasori/graphql/pkg/service"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )

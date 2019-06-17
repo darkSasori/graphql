@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/darksasori/graphql/model"
+	"github.com/darksasori/graphql/pkg/model"
 )
 
 // Cursor interface used in user service

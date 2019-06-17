@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 
-	"github.com/darksasori/graphql/db"
-	"github.com/darksasori/graphql/model"
-	"github.com/darksasori/graphql/repository"
-	"github.com/darksasori/graphql/service"
+	"github.com/darksasori/graphql/pkg/db"
+	"github.com/darksasori/graphql/pkg/model"
+	"github.com/darksasori/graphql/pkg/repository"
+	"github.com/darksasori/graphql/pkg/service"
+	"github.com/darksasori/graphql/pkg/utils"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	connDB := conn.Database("test")
+	connDB := conn.Database(utils.GetEnvDefault("MONGODB_NAME", "blog"))
 
 	userService := service.NewUser(repository.NewUser(connDB))
 	user := model.NewUser("lineufelipe", "Lineu Felipe")
