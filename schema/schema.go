@@ -1,7 +1,6 @@
 package schema
 
-func getSchema() string {
-	return `
+const schemaSctring = `
 schema {
 	query: Queries
 }
@@ -16,4 +15,3 @@ type User {
 	username: String
 }
 `
-}

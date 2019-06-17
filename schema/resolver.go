@@ -16,7 +16,7 @@ func New(user *service.User) *graphql.Schema {
 	r := &Resolver{
 		user,
 	}
-	return graphql.MustParseSchema(getSchema(), r)
+	return graphql.MustParseSchema(schemaSctring, r)
 }
 
 func (r *Resolver) ListUsers(ctx context.Context) (*[]*UserResolver, error) {
