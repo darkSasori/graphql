@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/darksasori/graphql/model"
+	"github.com/darksasori/graphql/pkg/model"
 	"gotest.tools/assert"
 )
 
