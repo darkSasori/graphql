@@ -5,7 +5,7 @@ import "time"
 // Tweet model
 type Tweet struct {
 	ID       interface{} `bson:"_id,omitempty"`
-	UserID   interface{}
+	UserID   string
 	Likes    int
 	Body     string
 	DateTime time.Time
@@ -14,7 +14,7 @@ type Tweet struct {
 // NewTweet return a pointer to Tweet
 func NewTweet(body string, user *User) *Tweet {
 	return &Tweet{
-		UserID:   user.ID,
+		UserID:   user.Username,
 		Body:     body,
 		DateTime: time.Now(),
 	}

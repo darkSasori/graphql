@@ -6,6 +6,7 @@ import (
 	"github.com/darksasori/graphql/pkg/model"
 	"github.com/darksasori/graphql/pkg/service"
 	graphql "github.com/graph-gophers/graphql-go"
+	"github.com/pkg/errors"
 )
 
 type Resolver struct {
@@ -27,8 +28,8 @@ func (r *Resolver) ListUsers(ctx context.Context) (*[]*UserResolver, error) {
 		return nil, err
 	}
 
-	var u model.User
 	for cursor.Next(ctx) {
+		var u model.User
 		if err = cursor.Decode(&u); err != nil {
 			return nil, err
 		}
@@ -36,4 +37,17 @@ func (r *Resolver) ListUsers(ctx context.Context) (*[]*UserResolver, error) {
 	}
 
 	return &users, nil
+}
+
+type userInput struct {
+	Username, Displayname *string
+}
+
+func (r *Resolver) SaveUser(ctx context.Context, args struct{ User userInput }) (*UserResolver, error) {
+	u := model.NewUser(*args.User.Username, *args.User.Displayname)
+	if err := r.user.Save(ctx, u); err != nil {
+		return nil, errors.Wrap(err, "SaveUser")
+	}
+
+	return &UserResolver{u}, nil
 }

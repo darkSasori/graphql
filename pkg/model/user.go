@@ -2,8 +2,8 @@ package model
 
 // User model
 type User struct {
-	ID                    interface{} `bson:"_id,omitempty"`
-	Username, Displayname string
+	Username    string `bson:"_id"`
+	Displayname string
 }
 
 // NewUser return a pointer to User

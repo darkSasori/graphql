@@ -21,7 +21,7 @@ func NewTweet(client *mongo.Database) *Tweet {
 
 // FindByUser return all tweet user
 func (t *Tweet) FindByUser(ctx context.Context, user *model.User) (service.Cursor, error) {
-	return t.coll.Find(ctx, bson.D{{"user", user.ID}})
+	return t.coll.Find(ctx, bson.D{{"user", user.Username}})
 }
 
 // FindAll return all tweet

@@ -1,8 +1,4 @@
 
-dev:
-	go build -tags dev -o bin/dev cmd/test.go
-	./bin/dev
-
 test-unit:
 	go test -v --tags test_unit -race github.com/darksasori/graphql/pkg/...
 
@@ -10,9 +6,16 @@ lint:
 	golint -set_exit_status ./...
 
 
-graphql:
-	go build -tags dev -o bin/graphql cmd/graphql.go
-	./bin/graphql
+server:
+	go build -tags dev -o bin/server cmd/server.go
+	./bin/server
 
 test:
 	curl -XPOST -d '{"query": "{ listUsers { id, displayname } }"}' localhost:8080/graphql |jq
+
+deploy:
+	gcloud alpha functions deploy Graphql \
+		--entry-point Graphql \
+		--runtime go111 \
+		--trigger-http \
+		--env-vars-file=env

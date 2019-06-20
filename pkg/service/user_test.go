@@ -47,7 +47,7 @@ func (r *repository) FindAll(ctx context.Context) (Cursor, error) {
 
 func (r *repository) FindOne(ctx context.Context, id interface{}) (*model.User, error) {
 	for i := range r.users {
-		if r.users[i].ID == id {
+		if r.users[i].Username == id {
 			return r.users[i], nil
 		}
 	}
@@ -56,15 +56,13 @@ func (r *repository) FindOne(ctx context.Context, id interface{}) (*model.User, 
 }
 
 func (r *repository) Insert(ctx context.Context, user *model.User) error {
-	user.ID = len(r.users) + 1
 	r.users = append(r.users, user)
 	return nil
 }
 
 func (r *repository) Update(ctx context.Context, user *model.User) error {
 	for i := range r.users {
-		if r.users[i].ID == user.ID {
-			r.users[i].Username = user.Username
+		if r.users[i].Username == user.Username {
 			r.users[i].Displayname = user.Displayname
 			return nil
 		}
@@ -75,7 +73,7 @@ func (r *repository) Update(ctx context.Context, user *model.User) error {
 
 func (r *repository) Delete(ctx context.Context, user *model.User) error {
 	for i := range r.users {
-		if r.users[i].ID == user.ID {
+		if r.users[i].Username == user.Username {
 			r.users = append(r.users[:i], r.users[i+1:]...)
 			return nil
 		}

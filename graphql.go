@@ -1,9 +1,11 @@
-package main
+package graphql
 
 import (
 	"context"
+	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 
 	"github.com/darksasori/graphql/pkg/db"
 	"github.com/darksasori/graphql/pkg/repository"
@@ -11,8 +13,6 @@ import (
 	"github.com/darksasori/graphql/pkg/service"
 	"github.com/darksasori/graphql/pkg/utils"
 	"github.com/graph-gophers/graphql-go/relay"
-
-	"log"
 )
 
 type playgroundData struct {
@@ -22,50 +22,57 @@ type playgroundData struct {
 	SetTitle             bool
 }
 
-func main() {
-	conn, err := db.Connect(context.TODO())
+var handler *relay.Handler
+var temp *template.Template
+
+func init() {
+	uri := utils.GetEnvDefault("MONGODB_URI", "mongodb://localhost:27017")
+	fmt.Println(uri)
+	ctx, cancel := context.WithTimeout(context.TODO(), 15*time.Second)
+	defer cancel()
+	conn, err := db.Connect(ctx)
 	if err != nil {
 		panic(err)
 	}
-	connDB := conn.Database(utils.GetEnvDefault("MONGODB_NAME", "blog"))
+
+	db := utils.GetEnvDefault("MONGODB_NAME", "gcloud")
+	fmt.Println(db)
+	connDB := conn.Database(db)
 
 	user := service.NewUser(repository.NewUser(connDB))
 	s := schema.New(user)
-	handler := &relay.Handler{Schema: s}
+	handler = &relay.Handler{Schema: s}
 
 	t := template.New("Playground")
-	t, err = t.Parse(playgroundTemplate)
+	temp, err = t.Parse(playgroundTemplate)
 	if err != nil {
 		panic(err)
 	}
+}
 
-	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		w.Header().Add("Access-Control-Allow-Headers", "Content-Type,x-apollo-tracing")
-		w.Header().Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+func Graphql(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+	w.Header().Add("Access-Control-Allow-Headers", "Content-Type,x-apollo-tracing")
+	w.Header().Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 
-		switch r.Method {
-		case http.MethodPost:
-			handler.ServeHTTP(w, r)
-		case http.MethodOptions:
-			w.WriteHeader(http.StatusOK)
-		case http.MethodGet:
-			d := playgroundData{
-				PlaygroundVersion: "1.5.2",
-				Endpoint:          r.URL.Path,
-				SetTitle:          true,
-			}
-			err = t.ExecuteTemplate(w, "index", d)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		default:
-			w.WriteHeader(http.StatusMethodNotAllowed)
+	switch r.Method {
+	case http.MethodPost:
+		handler.ServeHTTP(w, r)
+	case http.MethodOptions:
+		w.WriteHeader(http.StatusOK)
+	case http.MethodGet:
+		d := playgroundData{
+			PlaygroundVersion: "1.5.2",
+			Endpoint:          r.URL.Path,
+			SetTitle:          true,
 		}
-	})
-
-	log.Println("Listen on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+		err := temp.ExecuteTemplate(w, "index", d)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
 const playgroundTemplate = `

@@ -20,16 +20,15 @@ func NewUser(client *mongo.Database) *User {
 }
 
 func (u *User) getFilterOne(user *model.User) bson.M {
-	return bson.M{"_id": user.ID}
+	return bson.M{"_id": user.Username}
 }
 
 // Insert a new user in db
 func (u *User) Insert(ctx context.Context, user *model.User) error {
-	result, err := u.coll.InsertOne(ctx, user)
-	if err != nil {
+	if _, err := u.coll.InsertOne(ctx, user); err != nil {
 		return err
 	}
-	user.ID = result.InsertedID
+
 	return nil
 }
 
@@ -61,7 +60,6 @@ func (u *User) Delete(ctx context.Context, user *model.User) error {
 func (u *User) Update(ctx context.Context, user *model.User) error {
 	update := bson.D{
 		{"$set", bson.D{
-			{"username", user.Username},
 			{"displayname", user.Displayname},
 		}},
 	}
