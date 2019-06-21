@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"html/template"
+	"io"
 	"net/http"
 	"time"
 
@@ -15,15 +15,7 @@ import (
 	"github.com/graph-gophers/graphql-go/relay"
 )
 
-type playgroundData struct {
-	PlaygroundVersion    string
-	Endpoint             string
-	SubscriptionEndpoint string
-	SetTitle             bool
-}
-
 var handler *relay.Handler
-var temp *template.Template
 
 func init() {
 	uri := utils.GetEnvDefault("MONGODB_URI", "mongodb://localhost:27017")
@@ -42,12 +34,6 @@ func init() {
 	user := service.NewUser(repository.NewUser(connDB))
 	s := schema.New(user)
 	handler = &relay.Handler{Schema: s}
-
-	t := template.New("Playground")
-	temp, err = t.Parse(playgroundTemplate)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func Graphql(w http.ResponseWriter, r *http.Request) {
@@ -61,81 +47,45 @@ func Graphql(w http.ResponseWriter, r *http.Request) {
 	case http.MethodOptions:
 		w.WriteHeader(http.StatusOK)
 	case http.MethodGet:
-		d := playgroundData{
-			PlaygroundVersion: "1.5.2",
-			Endpoint:          r.URL.Path,
-			SetTitle:          true,
-		}
-		err := temp.ExecuteTemplate(w, "index", d)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		io.WriteString(w, playgroundHtml)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-const playgroundTemplate = `
-{{ define "index" }}
-<!--
-The request to this GraphQL server provided the header "Accept: text/html"
-and as a result has been presented Playground - an in-browser IDE for
-exploring GraphQL.
-If you wish to receive JSON, provide the header "Accept: application/json" or
-add "&raw" to the end of the URL within a browser.
--->
+const playgroundHtml = `
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset=utf-8/>
-  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
-  <title>GraphQL Playground</title>
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/graphql-playground-react/build/static/css/index.css" />
-  <link rel="shortcut icon" href="//cdn.jsdelivr.net/npm/graphql-playground-react/build/favicon.png" />
-  <script src="//cdn.jsdelivr.net/npm/graphql-playground-react/build/static/js/middleware.js"></script>
-</head>
-<body>
-  <div id="root">
-    <style>
-      body {
-        background-color: rgb(23, 42, 58);
-        font-family: Open Sans, sans-serif;
-        height: 90vh;
-      }
-      #root {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .loading {
-        font-size: 32px;
-        font-weight: 200;
-        color: rgba(255, 255, 255, .6);
-        margin-left: 20px;
-      }
-      img {
-        width: 78px;
-        height: 78px;
-      }
-      .title {
-        font-weight: 400;
-      }
-    </style>
-    <img src='//cdn.jsdelivr.net/npm/graphql-playground-react/build/logo.png' alt=''>
-    <div class="loading"> Loading
-      <span class="title">GraphQL Playground</span>
-    </div>
-  </div>
-  <script>window.addEventListener('load', function (event) {
-      GraphQLPlayground.init(document.getElementById('root'), {
-        // options as 'endpoint' belong here
-        endpoint: {{ .Endpoint }},
-        setTitle: {{ .SetTitle }}
-      })
-    })</script>
-</body>
+	<head>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.10.2/graphiql.css" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.1.0/fetch.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react-dom.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.10.2/graphiql.js"></script>
+	</head>
+	<body style="width: 100%; height: 100%; margin: 0; overflow: hidden;">
+		<div id="graphiql" style="height: 100vh;">Loading...</div>
+		<script>
+			function graphQLFetcher(graphQLParams) {
+				return fetch("/graphql", {
+					method: "post",
+					body: JSON.stringify(graphQLParams),
+					credentials: "include",
+				}).then(function (response) {
+					return response.text();
+				}).then(function (responseBody) {
+					try {
+						return JSON.parse(responseBody);
+					} catch (error) {
+						return responseBody;
+					}
+				});
+			}
+			ReactDOM.render(
+				React.createElement(GraphiQL, {fetcher: graphQLFetcher}),
+				document.getElementById("graphiql")
+			);
+		</script>
+	</body>
 </html>
-{{ end }}
 `
