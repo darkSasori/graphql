@@ -2,7 +2,6 @@ package graphql
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -18,8 +17,6 @@ import (
 var handler *relay.Handler
 
 func init() {
-	uri := utils.GetEnvDefault("MONGODB_URI", "mongodb://localhost:27017")
-	fmt.Println(uri)
 	ctx, cancel := context.WithTimeout(context.TODO(), 15*time.Second)
 	defer cancel()
 	conn, err := db.Connect(ctx)
@@ -28,7 +25,6 @@ func init() {
 	}
 
 	db := utils.GetEnvDefault("MONGODB_NAME", "gcloud")
-	fmt.Println(db)
 	connDB := conn.Database(db)
 
 	user := service.NewUser(repository.NewUser(connDB))
