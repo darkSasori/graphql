@@ -32,6 +32,7 @@ func init() {
 	handler = &relay.Handler{Schema: s}
 }
 
+// Graphql handle request
 func Graphql(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type,x-apollo-tracing")
@@ -43,13 +44,13 @@ func Graphql(w http.ResponseWriter, r *http.Request) {
 	case http.MethodOptions:
 		w.WriteHeader(http.StatusOK)
 	case http.MethodGet:
-		io.WriteString(w, playgroundHtml)
+		io.WriteString(w, playgroundHTML)
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 
-const playgroundHtml = `
+const playgroundHTML = `
 <!DOCTYPE html>
 <html>
 	<head>
