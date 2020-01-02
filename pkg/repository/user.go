@@ -61,6 +61,7 @@ func (u *User) Update(ctx context.Context, user *model.User) error {
 	update := bson.D{
 		{"$set", bson.D{
 			{"displayname", user.Displayname},
+			{"image", user.Image},
 		}},
 	}
 	_, err := u.coll.UpdateOne(ctx, u.getFilterOne(user), update)

@@ -17,10 +17,12 @@ type Mutation {
 type User {
 	displayname: String
 	username: String
+	image: String
 }
 
 input UserInput {
 	displayname: String
 	username: String
+	image: String
 }
 `

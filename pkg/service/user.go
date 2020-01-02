@@ -18,15 +18,24 @@ func NewUser(repository UserRepository) *User {
 
 // Save the user
 func (u *User) Save(ctx context.Context, user *model.User) error {
-	if _, err := u.Repository.FindOne(ctx, user.Username); err != nil {
+	userExist, err := u.Repository.FindOne(ctx, user.Username)
+	if err != nil {
 		if err := u.Repository.Insert(ctx, user); err != nil {
 			return err
 		}
 		return nil
 	}
 
-	if err := u.Repository.Update(ctx, user); err != nil {
-		panic(err)
+	if user.Displayname != "" {
+		userExist.Displayname = user.Displayname
+	}
+
+	if user.Image != "" {
+		userExist.Image = user.Image
+	}
+
+	if err := u.Repository.Update(ctx, userExist); err != nil {
+		return err
 	}
 	return nil
 }

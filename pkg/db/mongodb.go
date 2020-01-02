@@ -12,7 +12,7 @@ import (
 var mongoClient *mongo.Client
 
 func init() {
-	uri := utils.GetEnvDefault("MONGODB_URI", "mongodb://localhost:27017")
+	uri := utils.GetEnvDefault("MONGODB_URI", "")
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)

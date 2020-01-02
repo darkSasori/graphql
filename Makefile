@@ -8,12 +8,15 @@ server:
 	go build -tags dev -o bin/server cmd/server.go
 	./bin/server
 
-test:
-	curl -XPOST -d '{"query": "{ listUsers { id, displayname } }"}' localhost:8080/graphql |jq
+create-env:
+	./bin/create_env.sh
 
 deploy:
-	gcloud alpha functions deploy graphql \
+	gcloud functions deploy graphql \
 		--entry-point Graphql \
 		--runtime go111 \
 		--trigger-http \
-		--env-vars-file=env
+		--env-vars-file envs.yml
+
+mongodb:
+	docker run --rm --name "mongodb" -d -p 27017:27017 mongo
