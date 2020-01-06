@@ -8,9 +8,6 @@ server:
 	go build -tags dev -o bin/server cmd/server.go
 	./bin/server
 
-create-env:
-	./create_env.sh
-
 deploy:
 	gcloud functions deploy graphql \
 		--entry-point Graphql \
