@@ -9,7 +9,7 @@ server:
 	./bin/server
 
 create-env:
-	./bin/create_env.sh
+	./create_env.sh
 
 deploy:
 	gcloud functions deploy graphql \

@@ -1,0 +1,28 @@
+name: CD
+on:
+  push:
+    branchs:
+      - master
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
+
+    - name: Deploy
+      uses: actions-hub/gcloud@271.0.0
+      env:
+        PROJECT_ID: ${{secrets.PROJECT_ID}}
+        APPLICATION_CREDENTIALS: ${{secrets.APPLICATION_CREDENTIALS}}
+      with:
+        args: |
+          functions deploy graphql \
+          --entry-point Graphql \
+          --runtime go111 \
+          --trigger-http \
+          --update-env-vars \
+            CLIENT_ID=${{secrets.CLIENT_ID}},CLIENT_SECRET=${{secrets.CLIENT_SECRET}},REDIRECT_URL=${{secrets.REDIRECT_URL}},MONGODB_URI=${{secrets.MONGODB_URI}}
+
