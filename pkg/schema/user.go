@@ -4,8 +4,6 @@ import (
 	"context"
 
 	"github.com/darksasori/graphql/pkg/model"
-	"github.com/darksasori/graphql/pkg/utils"
-	"github.com/pkg/errors"
 )
 
 type UserResolver struct {
@@ -41,32 +39,4 @@ func (r *Resolver) ListUsers(ctx context.Context) (*[]*UserResolver, error) {
 	}
 
 	return &users, nil
-}
-
-type userInput struct {
-	Username, Displayname, Image *string
-}
-
-func (r *Resolver) SaveUser(ctx context.Context, args struct{ User userInput }) (*UserResolver, error) {
-	u := &model.User{
-		Username: *args.User.Username,
-	}
-	if args.User.Displayname != nil {
-		u.Displayname = *args.User.Displayname
-	}
-	if args.User.Image != nil {
-		u.Image = *args.User.Image
-	}
-	userLogger, ok := utils.GetUser(ctx)
-	if !ok {
-		return nil, errors.New("User not found")
-	}
-	if userLogger.Username != u.Username {
-		return nil, errors.New("Operation is not permitted")
-	}
-	if err := r.user.Save(ctx, u); err != nil {
-		return nil, errors.Wrap(err, "SaveUser")
-	}
-
-	return &UserResolver{u}, nil
 }
